@@ -9,17 +9,27 @@ namespace BL
     public class BaseEntity
     {
         public string Id { get; set; }
-        public void Save()
-        {
-            if (Id == null)
-                Id = Guid.NewGuid().ToString();
-        }
         public void Delete() { }
         public BaseEntity() { }
     }
-    public class BaseEntity<T> : BaseEntity where T : new()
+    public class BaseEntity<T> : BaseEntity where T : BaseEntity, new()
     {
+        private T _entity;
+        private static IList<T> _db = new List<T>();
+        public void Save()
+        {
+            if (Id == null)
+            {
+                _entity = new T();
+                var tp = typeof(T);
+                
+                //.tp.GetProperties()
+                _entity.Id = Guid.NewGuid().ToString();
+                Id = _entity.Id;
+                _db.Add(_entity);
+            }
+        }
 
-        public static T Find(string id) { return new T(); }
+        public static T Find(string id) { return _db.FirstOrDefault(x => x.Id == id); }
     }
 }
