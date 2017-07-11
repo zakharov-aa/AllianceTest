@@ -9,17 +9,27 @@ namespace BL
 {
     public class Dictionary
     {
-        public BaseEntity this[BaseEntity index]
+        public Dictionary()
+        {
+            _data = new List<BaseEntity>();
+        }
+        private IList<BaseEntity> _data;
+        public BaseEntity this[BaseEntity entity]
         {
             get
             {
-                return new BaseEntity();
+                return _data.Single(x => x == entity);
             }
             set
             {
+                _data.Add(value);
             }
         }
 
-        public bool ContainsKey(BaseEntity entity) { return true; }
+        public bool ContainsKey(BaseEntity entity)
+        {
+            return _data.Any(x => x.EqualsByProperties(entity));
+        }
+
     }
 }

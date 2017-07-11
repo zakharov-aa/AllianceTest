@@ -13,11 +13,6 @@ namespace BL
         public string ZipCode { get; set; }
         public string PostStamp { get; set; }
         public Address() : base() { }
-        protected override void HandleCloned(AbstractCloneable clone)
-        {
-            base.HandleCloned(clone);
-            Address obj = (Address)clone;
-        }
         public Address(string fullName, string name, string postStamp, string zipCode)
         {
             FullName = fullName;
@@ -25,6 +20,10 @@ namespace BL
             PostStamp = postStamp;
             ZipCode = zipCode;
         }
-
+        protected override void HandleCloned(AbstractCloneable clone)
+        {
+            base.HandleCloned(clone);
+            Address obj = (Address)clone;
+        }
     }
 }

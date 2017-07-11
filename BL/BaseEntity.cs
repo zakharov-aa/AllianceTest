@@ -9,7 +9,25 @@ namespace BL
     public class BaseEntity : AbstractCloneable
     {
         public string Id { get; set; }
-        public void Delete() { }
+        public bool EqualsByProperties(object obj)
+        {
+            var tpObj = obj.GetType();
+            var tp = this.GetType();
+            if (tpObj != tp)
+                return false;
+            else
+                foreach (var property in tp.GetProperties())
+                {
+                    if (property.Name != "Id")
+                    {
+                        var valueObj = property.GetValue(obj, null);
+                        var value = property.GetValue(this, null);
+                        if (valueObj != value)
+                            return false;
+                    }
+                }
+            return true;
+        }
         protected override void HandleCloned(AbstractCloneable clone)
         {
             base.HandleCloned(clone);
@@ -21,6 +39,12 @@ namespace BL
     {
         private T _entity;
         private static IList<T> _db = new List<T>();
+        public void Delete()
+        {
+            var removeEntity = _db.FirstOrDefault(x => x.Id == this.Id);
+            _db.Remove(removeEntity);
+            Id = String.Empty;
+        }
         public void Save()
         {
             if (Id == null)
@@ -65,6 +89,13 @@ namespace BL
             return Id.GetHashCode();
         }
 
-        public static T Find(string id) { return _db.FirstOrDefault(x => x.Id == id).Clone() as T; }
+        public static T Find(string id)
+        {
+            var findRes = _db.FirstOrDefault(x => x.Id == id);
+            if (findRes != null)
+                return findRes.Clone() as T;
+            else
+                return null;
+        }
     }
 }
