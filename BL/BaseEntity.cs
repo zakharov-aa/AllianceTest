@@ -48,7 +48,7 @@ namespace BL
         public void Save()
         {
             if (!String.IsNullOrWhiteSpace(Id) && _db.Any(x => x.Id == Id))
-                return; //TO DO: Get entity from _db and Update properties 
+                return; //TODO: Get entity from _db and Update properties 
             else
             {
                 _entity = new T();
@@ -56,7 +56,7 @@ namespace BL
                 //Set All properties
                 foreach (var property in tp.GetProperties())
                 {
-                    //TO DO: How to find out
+                    //TODO: How to find out
                     if (property.PropertyType.BaseType.IsGenericType
                         && property.PropertyType.BaseType.BaseType == typeof(BaseEntity))
                     {
@@ -98,6 +98,9 @@ namespace BL
 
         public override int GetHashCode()
         {
+            //TODO: maby we should override this method in all Logic classes
+            if (String.IsNullOrWhiteSpace(Id))
+                throw new NullReferenceException("Entity Id should be filled in order to use GetHashCode(). Save your entity to DB or use Equals");
             return Id.GetHashCode();
         }
 
