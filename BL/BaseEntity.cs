@@ -47,7 +47,9 @@ namespace BL
         }
         public void Save()
         {
-            if (Id == null)
+            if (!String.IsNullOrWhiteSpace(Id) && _db.Any(x => x.Id == Id))
+                return; //TO DO: Get entity from _db and Update properties 
+            else
             {
                 _entity = new T();
                 var tp = typeof(T);
@@ -69,7 +71,8 @@ namespace BL
                         property.SetValue(_entity, value);
                     }
                 }
-                if (String.IsNullOrWhiteSpace(_entity.Id))
+                //Genetare Id only if we don't have one
+                if (String.IsNullOrWhiteSpace(this.Id))
                     _entity.Id = Guid.NewGuid().ToString();
                 Id = _entity.Id;
                 _db.Add(_entity);
