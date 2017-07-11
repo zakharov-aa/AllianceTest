@@ -16,5 +16,11 @@ namespace BL
             Name = name;
             Address = address;
         }
+        protected override void HandleCloned(AbstractCloneable clone)
+        {
+            base.HandleCloned(clone);
+            Business obj = (Business)clone;
+            obj.Address = (Address)this.Address.Clone();
+        }
     }
 }
