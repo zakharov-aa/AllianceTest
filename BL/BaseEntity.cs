@@ -9,7 +9,7 @@ namespace BL
     public class BaseEntity : AbstractCloneable
     {
         public string Id { get; set; }
-        public bool EqualsByProperties(object obj)
+        protected bool EqualsByProperties(object obj)
         {
             var tpObj = obj.GetType();
             var tp = this.GetType();
@@ -54,6 +54,7 @@ namespace BL
                 //Set All properties
                 foreach (var property in tp.GetProperties())
                 {
+                    //TO DO: How to find out
                     if (property.PropertyType.BaseType.IsGenericType
                         && property.PropertyType.BaseType.BaseType == typeof(BaseEntity))
                     {
@@ -81,7 +82,15 @@ namespace BL
             if (item == null)
                 return false;
 
-            return this.GetHashCode() == item.GetHashCode();
+            var tpObj = obj.GetType();
+            var tp = this.GetType();
+            if (tpObj != tp)
+                return false;
+
+            if (!String.IsNullOrWhiteSpace(Id) && !String.IsNullOrWhiteSpace(item.Id))
+                return this.GetHashCode() == item.GetHashCode();
+            else
+                return EqualsByProperties(obj);
         }
 
         public override int GetHashCode()

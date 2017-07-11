@@ -11,24 +11,27 @@ namespace BL
     {
         public Dictionary()
         {
-            _data = new List<BaseEntity>();
+            _data = new Dictionary<BaseEntity, BaseEntity>();
         }
-        private IList<BaseEntity> _data;
+        private IDictionary<BaseEntity, BaseEntity> _data;
         public BaseEntity this[BaseEntity entity]
         {
             get
             {
-                return _data.Single(x => x == entity);
+                if (ContainsKey(entity))
+                    return _data[entity];
+                else
+                    throw new ArgumentException("There is no such key");
             }
             set
             {
-                _data.Add(value);
+                _data.Add(value, value);
             }
         }
 
         public bool ContainsKey(BaseEntity entity)
         {
-            return _data.Any(x => x.EqualsByProperties(entity));
+            return _data.Any(x => x.Key.Equals(entity));
         }
 
     }
