@@ -11,10 +11,10 @@ namespace BL
     {
         public Dictionary()
         {
-            _data = new Dictionary<BaseEntity, BaseEntity>();
+            _data = new Dictionary<object, object>();
         }
-        private IDictionary<BaseEntity, BaseEntity> _data;
-        public BaseEntity this[BaseEntity entity]
+        private IDictionary<object, object> _data;
+        public object this[object entity]
         {
             get
             {
@@ -29,10 +29,9 @@ namespace BL
             }
         }
 
-        public bool ContainsKey(BaseEntity entity)
+        public bool ContainsKey(object entity)
         {
             return _data.Any(x => x.Key.Equals(entity));
         }
-
     }
 }

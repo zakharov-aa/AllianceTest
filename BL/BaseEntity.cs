@@ -1,14 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace BL
 {
-    public class BaseEntity : AbstractCloneable
+    [Serializable]
+    public class BaseEntity<T> where T : BaseEntity<T>, new()
     {
         public string Id { get; set; }
+
+        public void Delete()
+        {
+            if (!String.IsNullOrWhiteSpace(this.Id))
+            {
+                var fullPath = Path.Combine(Config.FilesPath, this.Id);
+                if (File.Exists(fullPath))
+                    File.Delete(fullPath);
+            }
+            Id = null;
+        }
+        public void Save()
+        {
+            if (!String.IsNullOrWhiteSpace(Id) && Find(Id) != null)
+                return; //TODO: Get entity from _db and Update properties 
+            else
+            {
+                //Genetare Id only if we don't have one
+                if (String.IsNullOrWhiteSpace(this.Id))
+                    Id = Guid.NewGuid().ToString();
+                var savePath = Path.Combine(Config.FilesPath, Id);
+                SerializeDeserializeHelper.SerializeObject(this, savePath);
+            }
+        }
+
+        public static T Find(string id)
+        {
+            if (id == null)
+                return null;
+            var fullPath = Path.Combine(Config.FilesPath, id);
+            if (File.Exists(fullPath))
+                return SerializeDeserializeHelper.DeSerializeObject<T>(fullPath);
+            else
+                return null;
+        }
+
         protected bool EqualsByProperties(object obj)
         {
             var tpObj = obj.GetType();
@@ -27,56 +67,6 @@ namespace BL
                     }
                 }
             return true;
-        }
-        protected override void HandleCloned(AbstractCloneable clone)
-        {
-            base.HandleCloned(clone);
-            BaseEntity obj = (BaseEntity)clone;
-        }
-        public BaseEntity() { }
-    }
-    public class BaseEntity<T> : BaseEntity where T : BaseEntity, new()
-    {
-        private T _entity;
-        private static IList<T> _db = new List<T>();
-        public void Delete()
-        {
-            var removeEntity = _db.FirstOrDefault(x => x.Id == this.Id);
-            _db.Remove(removeEntity);
-            Id = String.Empty;
-        }
-        public void Save()
-        {
-            if (!String.IsNullOrWhiteSpace(Id) && _db.Any(x => x.Id == Id))
-                return; //TODO: Get entity from _db and Update properties 
-            else
-            {
-                _entity = new T();
-                var tp = typeof(T);
-                //Set All properties
-                foreach (var property in tp.GetProperties())
-                {
-                    //TODO: How to find out
-                    if (property.PropertyType.BaseType.IsGenericType
-                        && property.PropertyType.BaseType.BaseType == typeof(BaseEntity))
-                    {
-                        var methodInfo = property.PropertyType.BaseType.GetMethod("Save");
-                        var value = property.GetValue(this, null);
-                        var res = methodInfo.Invoke(value, null);
-                        property.SetValue(_entity, value);
-                    }
-                    else
-                    {
-                        var value = property.GetValue(this, null);
-                        property.SetValue(_entity, value);
-                    }
-                }
-                //Genetare Id only if we don't have one
-                if (String.IsNullOrWhiteSpace(this.Id))
-                    _entity.Id = Guid.NewGuid().ToString();
-                Id = _entity.Id;
-                _db.Add(_entity);
-            }
         }
 
         public override bool Equals(object obj)
@@ -98,19 +88,9 @@ namespace BL
 
         public override int GetHashCode()
         {
-            //TODO: maby we should override this method in all Logic classes
             if (String.IsNullOrWhiteSpace(Id))
-                throw new NullReferenceException("Entity Id should be filled in order to use GetHashCode(). Save your entity to DB or use Equals");
+                Id = Guid.NewGuid().ToString();
             return Id.GetHashCode();
-        }
-
-        public static T Find(string id)
-        {
-            var findRes = _db.FirstOrDefault(x => x.Id == id);
-            if (findRes != null)
-                return findRes.Clone() as T;
-            else
-                return null;
         }
     }
 }

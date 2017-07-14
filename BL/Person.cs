@@ -18,11 +18,12 @@ namespace BL
             LastName = lastName;
             Address = address;
         }
-        protected override void HandleCloned(AbstractCloneable clone)
+        public override int GetHashCode()
         {
-            base.HandleCloned(clone);
-            Person obj = (Person)clone;
-            obj.Address = (Address)this.Address.Clone();
+            if (base.GetHashCode() != 0)
+                return base.GetHashCode();
+            else
+                return FirstName.GetHashCode() ^ LastName.GetHashCode() ^ Address.GetHashCode();
         }
     }
 }

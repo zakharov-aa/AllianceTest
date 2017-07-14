@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BL
 {
-    public class Address: BaseEntity<Address>
+    public class Address : BaseEntity<Address>
     {
         public string FullName { get; set; }
         public string Name { get; set; }
@@ -20,10 +20,13 @@ namespace BL
             PostStamp = postStamp;
             ZipCode = zipCode;
         }
-        protected override void HandleCloned(AbstractCloneable clone)
+
+        public override int GetHashCode()
         {
-            base.HandleCloned(clone);
-            Address obj = (Address)clone;
+            if (base.GetHashCode() != 0)
+                return base.GetHashCode();
+            else
+                return FullName.GetHashCode() ^ Name.GetHashCode() ^ ZipCode.GetHashCode() ^ PostStamp.GetHashCode();
         }
     }
 }

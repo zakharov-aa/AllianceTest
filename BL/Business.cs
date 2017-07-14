@@ -16,11 +16,12 @@ namespace BL
             Name = name;
             Address = address;
         }
-        protected override void HandleCloned(AbstractCloneable clone)
+        public override int GetHashCode()
         {
-            base.HandleCloned(clone);
-            Business obj = (Business)clone;
-            obj.Address = (Address)this.Address.Clone();
+            if (base.GetHashCode() != 0)
+                return base.GetHashCode();
+            else
+                return Address.GetHashCode() ^ Name.GetHashCode();
         }
     }
 }
