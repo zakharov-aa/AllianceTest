@@ -49,26 +49,6 @@ namespace BL
                 return null;
         }
 
-        protected bool EqualsByProperties(object obj)
-        {
-            var tpObj = obj.GetType();
-            var tp = this.GetType();
-            if (tpObj != tp)
-                return false;
-            else
-                foreach (var property in tp.GetProperties())
-                {
-                    if (property.Name != "Id")
-                    {
-                        var valueObj = property.GetValue(obj, null);
-                        var value = property.GetValue(this, null);
-                        if (valueObj != value)
-                            return false;
-                    }
-                }
-            return true;
-        }
-
         public override bool Equals(object obj)
         {
             var item = obj as T;
@@ -83,13 +63,13 @@ namespace BL
             if (!String.IsNullOrWhiteSpace(Id) && !String.IsNullOrWhiteSpace(item.Id))
                 return this.GetHashCode() == item.GetHashCode();
             else
-                return EqualsByProperties(obj);
+                return false;
         }
 
         public override int GetHashCode()
         {
             if (String.IsNullOrWhiteSpace(Id))
-                Id = Guid.NewGuid().ToString();
+                return 0;
             return Id.GetHashCode();
         }
     }
