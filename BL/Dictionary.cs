@@ -31,7 +31,7 @@ namespace BL
 
         public bool ContainsKey(object entity)
         {
-            return _data.Any(x => ((dynamic)x.Key).Equals(entity));
+            return _data.Any(x => x.Key.Equals(entity));
         }
     }
 }
